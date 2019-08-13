@@ -8,9 +8,9 @@ namespace DotNetCore.DI.Interception.Interceptors
         public void Intercept(IInvocation invocation)
         {
 
-            Debug.WriteLine($"Before {invocation.Method.Name}");
+            Debug.WriteLine($"-- Before {invocation.Method.Name}");
             invocation.Proceed();
-            Debug.WriteLine($"After {invocation.Method.Name}");
+            Debug.WriteLine($"-- After {invocation.Method.Name}");
         }
     }
 }

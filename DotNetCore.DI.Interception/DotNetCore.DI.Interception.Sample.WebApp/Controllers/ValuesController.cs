@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using DotNetCore.DI.Interception.Sample.Services;
+﻿using DotNetCore.DI.Interception.Sample.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace DotNetCore.DI.Interception.Sample.WebApp.Controllers
 {

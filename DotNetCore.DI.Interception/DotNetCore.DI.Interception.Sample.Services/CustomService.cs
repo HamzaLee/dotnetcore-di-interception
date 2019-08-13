@@ -2,6 +2,6 @@
 {
     public class CustomService : ICustomService
     {
-        public string GetValue() => "Hello World";
+        public virtual string GetValue() => "Hello World";
     }
 }
