@@ -1,5 +1,6 @@
 ﻿using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace DotNetCore.DI.Interception
 {
@@ -7,11 +8,91 @@ namespace DotNetCore.DI.Interception
     {
         private static readonly ProxyGenerator Generator = new ProxyGenerator();
 
-        public static IServiceCollection AddTransient<TService, TImplementation>(this IServiceCollection services, params IInterceptor[] interceptors)
+        #region AddTransient
+
+        public static IServiceCollection AddTransient<TService>(this IServiceCollection services, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return services.AddTransient(typeof(TService), provider => Generator.CreateClassProxy<TService>(interceptors));
+        }
+        public static IServiceCollection AddTransient<TService, TImplementation>(this IServiceCollection services, IInterceptor[] interceptors)
             where TService : class
             where TImplementation : class, TService
         {
-            return services.AddTransient<TService, TImplementation>(provider => Generator.CreateClassProxy<TImplementation>(interceptors));
+            return services.AddTransient(typeof(TService), provider => Generator.CreateClassProxy<TImplementation>(interceptors));
         }
+        public static IServiceCollection AddTransient<TService>(this IServiceCollection services,
+            Func<IServiceProvider, TService> implementationFactory, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return services.AddTransient(typeof(TService), provider => Generator.CreateClassProxyWithTarget(implementationFactory(provider), interceptors));
+        }
+        public static IServiceCollection AddTransient<TService, TImplementation>(this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory, IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return services.AddTransient(typeof(TService), provider => Generator.CreateClassProxyWithTarget(implementationFactory(provider), interceptors));
+        }
+
+        #endregion
+
+        #region AddScoped
+
+        public static IServiceCollection AddScoped<TService>(this IServiceCollection services, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return services.AddScoped(typeof(TService), provider => Generator.CreateClassProxy<TService>(interceptors));
+        }
+        public static IServiceCollection AddScoped<TService, TImplementation>(this IServiceCollection services, IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return services.AddScoped(typeof(TService), provider => Generator.CreateClassProxy<TImplementation>(interceptors));
+        }
+        public static IServiceCollection AddScoped<TService>(this IServiceCollection services,
+            Func<IServiceProvider, TService> implementationFactory, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return services.AddScoped(typeof(TService), provider => Generator.CreateClassProxyWithTarget(implementationFactory(provider), interceptors));
+        }
+        public static IServiceCollection AddScoped<TService, TImplementation>(this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory, IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return services.AddScoped(typeof(TService), provider => Generator.CreateClassProxyWithTarget(implementationFactory(provider), interceptors));
+        }
+
+        #endregion
+
+        #region AddSingleton
+
+        public static IServiceCollection AddSingleton<TService>(this IServiceCollection services, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return services.AddSingleton(typeof(TService), provider => Generator.CreateClassProxy<TService>(interceptors));
+        }
+        public static IServiceCollection AddSingleton<TService, TImplementation>(this IServiceCollection services, IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return services.AddSingleton(typeof(TService), provider => Generator.CreateClassProxy<TImplementation>(interceptors));
+        }
+        public static IServiceCollection AddSingleton<TService>(this IServiceCollection services,
+            Func<IServiceProvider, TService> implementationFactory, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return services.AddSingleton(typeof(TService), provider => Generator.CreateClassProxyWithTarget(implementationFactory(provider), interceptors));
+        }
+        public static IServiceCollection AddSingleton<TService, TImplementation>(this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory, IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return services.AddSingleton(typeof(TService), provider => Generator.CreateClassProxyWithTarget(implementationFactory(provider), interceptors));
+        }
+
+        #endregion
     }
 }

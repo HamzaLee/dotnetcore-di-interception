@@ -1,4 +1,5 @@
-﻿using DotNetCore.DI.Interception.Interceptors;
+﻿using Castle.DynamicProxy;
+using DotNetCore.DI.Interception.Interceptors;
 using DotNetCore.DI.Interception.Sample.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,7 +22,7 @@ namespace DotNetCore.DI.Interception.Sample.WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddTransient<ICustomService, CustomService>(new DebuggerInterceptor());
+            services.AddTransient<ICustomService, CustomService>(new IInterceptor[] { new DebuggerInterceptor() });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
