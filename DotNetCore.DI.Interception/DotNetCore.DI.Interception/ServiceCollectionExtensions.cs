@@ -1,6 +1,7 @@
 ﻿using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DotNetCore.DI.Interception
@@ -17,13 +18,11 @@ namespace DotNetCore.DI.Interception
         {
             var serviceDescriptor = new ServiceDescriptor(typeof(TService), provider =>
             {
-
                 var implementationInstance = provider.GetRequiredService<TImplementation>();
-                var sd = services.First(s => s.ServiceType == typeof(TImplementation));
-                services.Remove(sd);
                 return Generator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, interceptors);
             }, serviceLifetime);
             services.Add(serviceDescriptor);
+            
             return services;
         }
 
@@ -61,7 +60,7 @@ namespace DotNetCore.DI.Interception
             services.Add(new ServiceDescriptor(typeof(TImplementation), implementationFactory, serviceLifetime));
             return AddResolvedService<TService, TImplementation>(services, serviceLifetime, interceptors);
         }
-        
+
         #endregion
 
         #region AddTransient
