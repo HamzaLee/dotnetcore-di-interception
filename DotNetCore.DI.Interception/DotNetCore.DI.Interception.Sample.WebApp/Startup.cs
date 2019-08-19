@@ -22,6 +22,8 @@ namespace DotNetCore.DI.Interception.Sample.WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSingleton<ICustomContext, CustomContext>(new IInterceptor[] { new DebuggerInterceptor() });
+            services.AddScoped<ICustomRepository, CustomRepository>(new IInterceptor[] { new DebuggerInterceptor() });
             services.AddTransient<ICustomService, CustomService>(new IInterceptor[] { new DebuggerInterceptor() });
         }
 

@@ -2,6 +2,12 @@
 {
     public class CustomService : ICustomService
     {
-        public virtual string GetValue() => "Hello World";
+        private readonly ICustomRepository _repository;
+
+        public CustomService(ICustomRepository repository)
+        {
+            _repository = repository;
+        }
+        public virtual string GetValue() => nameof(CustomService) + "(" + _repository.GetValue() + ")";
     }
 }
