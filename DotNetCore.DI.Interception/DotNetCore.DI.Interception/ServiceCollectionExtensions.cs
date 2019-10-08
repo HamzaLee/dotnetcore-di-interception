@@ -81,6 +81,11 @@ namespace DotNetCore.DI.Interception
             where TService : class
             where TImplementation : class, TService
         {
+            if (interceptors == null)
+            {
+                throw new ArgumentNullException(nameof(interceptors));
+            }
+
             TService ProxyFactory(TImplementation implementationInstance) =>
                 Generator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, interceptors);
 
@@ -96,6 +101,16 @@ namespace DotNetCore.DI.Interception
             where TService : class
             where TImplementation : class, TService
         {
+            if (proxyGenerationOptions == null)
+            {
+                throw new ArgumentNullException(nameof(proxyGenerationOptions));
+            }
+
+            if (interceptors == null)
+            {
+                throw new ArgumentNullException(nameof(interceptors));
+            }
+
             TService ProxyFactory(TImplementation implementationInstance) =>
                 Generator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, proxyGenerationOptions, interceptors);
 
@@ -110,6 +125,21 @@ namespace DotNetCore.DI.Interception
             where TService : class
             where TImplementation : class, TService
         {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (implementationFactory == null)
+            {
+                throw new ArgumentNullException(nameof(implementationFactory));
+            }
+
+            if (proxyFactory == null)
+            {
+                throw new ArgumentNullException(nameof(proxyFactory));
+            }
+
             var serviceDescriptor = new ServiceDescriptor(
                 typeof(TService),
                 provider =>
