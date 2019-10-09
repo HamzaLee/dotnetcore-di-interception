@@ -76,10 +76,10 @@ namespace DotNetCore.DI.Interception.Tests
 
         #endregion
 
-        #region AddDynamicProxyWithOptions
+        #region AddDynamicProxyWithImplementationFactoryAndOptions
 
         [Test]
-        public void AddDynamicProxyWithOptions()
+        public void AddDynamicProxyWithImplementationFactoryAndOptions()
         {
             var services = new ServiceCollection();
             TestService ImplementationFactory(IServiceProvider sp) => new TestService();
@@ -91,7 +91,7 @@ namespace DotNetCore.DI.Interception.Tests
                 ImplementationFactory,
                 ServiceLifetime.Transient,
                 proxyGenerationOptions,
-           interceptors);
+                interceptors);
 
             var serviceProvider = services.BuildServiceProvider();
             var service = serviceProvider.GetService<ITestService>();
@@ -111,7 +111,7 @@ namespace DotNetCore.DI.Interception.Tests
         }
 
         [Test]
-        public void AddDynamicProxyWithOptions_WhenProxyGenerationOptionsIsNull_ThenThrowException()
+        public void AddDynamicProxyWithImplementationFactoryAndOptions_WhenProxyGenerationOptionsIsNull_ThenThrowException()
         {
             var services = new ServiceCollection();
             TestService ImplementationFactory(IServiceProvider sp) => new TestService();
@@ -126,7 +126,7 @@ namespace DotNetCore.DI.Interception.Tests
         }
 
         [Test]
-        public void AddDynamicProxyWithOptions_WhenInterceptorsIsNull_ThenThrowException()
+        public void AddDynamicProxyWithImplementationFactoryAndOptions_WhenInterceptorsIsNull_ThenThrowException()
         {
             var services = new ServiceCollection();
             TestService ImplementationFactory(IServiceProvider sp) => new TestService();
@@ -142,10 +142,10 @@ namespace DotNetCore.DI.Interception.Tests
 
         #endregion
 
-        #region AddDynamicProxyWithoutOptions
+        #region AddDynamicProxyWithImplementationFactoryAndWithoutOptions
 
         [Test]
-        public void AddDynamicProxyWithoutOptions()
+        public void AddDynamicProxyWithImplementationFactoryAndWithoutOptions()
         {
             var services = new ServiceCollection();
             TestService ImplementationFactory(IServiceProvider sp) => new TestService();
@@ -175,7 +175,7 @@ namespace DotNetCore.DI.Interception.Tests
         }
 
         [Test]
-        public void AddDynamicProxyWithoutOptions_WhenInterceptorsIsNull_ThenThrowException()
+        public void AddDynamicProxyWithImplementationFactoryAndWithoutOptions_WhenInterceptorsIsNull_ThenThrowException()
         {
             var services = new ServiceCollection();
             TestService ImplementationFactory(IServiceProvider sp) => new TestService();
@@ -185,6 +185,73 @@ namespace DotNetCore.DI.Interception.Tests
                    ImplementationFactory,
                    ServiceLifetime.Transient,
                    interceptors: null));
+        }
+
+        #endregion
+
+        #region AddDynamicProxyWithOptions
+
+        [Test]
+        public void AddDynamicProxyWithOptions()
+        {
+            var services = new ServiceCollection();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            ServiceCollectionExtensions.Add<ITestService, TestService>(
+                services,
+                ServiceLifetime.Transient,
+                proxyGenerationOptions,
+                interceptors);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var service = serviceProvider.GetService<ITestService>();
+
+            Assert.IsNotNull(service);
+            Assert.IsInstanceOf<ITestService>(service);
+
+            var proxyTargetAccessor = service as IProxyTargetAccessor;
+            Assert.IsNotNull(proxyTargetAccessor);
+
+            var actualInterceptors = proxyTargetAccessor.GetInterceptors();
+            Assert.AreEqual(actualInterceptors.Length, interceptors.Length);
+            Assert.AreEqual(actualInterceptors[0], interceptors[0]);
+
+            var proxyTarget = proxyTargetAccessor.DynProxyGetTarget();
+            Assert.IsInstanceOf<TestService>(proxyTarget);
+        }
+
+        #endregion
+
+        #region AddDynamicProxyWithoutOptions
+
+        [Test]
+        public void AddDynamicProxyWithoutOptions()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            ServiceCollectionExtensions.Add<ITestService, TestService>(
+                services,
+                ServiceLifetime.Transient,
+                interceptors);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var service = serviceProvider.GetService<ITestService>();
+
+            Assert.IsNotNull(service);
+            Assert.IsInstanceOf<ITestService>(service);
+
+            var proxyTargetAccessor = service as IProxyTargetAccessor;
+            Assert.IsNotNull(proxyTargetAccessor);
+
+            var actualInterceptors = proxyTargetAccessor.GetInterceptors();
+            Assert.AreEqual(actualInterceptors.Length, interceptors.Length);
+            Assert.AreEqual(actualInterceptors[0], interceptors[0]);
+
+            var proxyTarget = proxyTargetAccessor.DynProxyGetTarget();
+            Assert.IsInstanceOf<TestService>(proxyTarget);
+
         }
 
         #endregion

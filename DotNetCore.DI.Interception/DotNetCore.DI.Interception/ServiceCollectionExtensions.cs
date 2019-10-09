@@ -11,7 +11,7 @@ namespace DotNetCore.DI.Interception
         private static readonly ProxyGenerator Generator = new ProxyGenerator();
 
         #region Generic
-
+        // BUG
         public static IServiceCollection Add<TService>(
             this IServiceCollection services,
             ServiceLifetime serviceLifetime,
@@ -21,6 +21,7 @@ namespace DotNetCore.DI.Interception
             return Add<TService, TService>(services, serviceLifetime, interceptors);
         }
 
+        // BUG
         public static IServiceCollection Add<TService>(
             this IServiceCollection services,
             ServiceLifetime serviceLifetime,
@@ -52,6 +53,7 @@ namespace DotNetCore.DI.Interception
             return Add<TService, TImplementation>(services, ActivatorUtilities.GetServiceOrCreateInstance<TImplementation>, serviceLifetime, proxyGenerationOptions, interceptors);
         }
 
+        // BUG : Specified type is not an interface Parameter name: interfaceToProxy
         public static IServiceCollection Add<TService>(
             this IServiceCollection services,
             Func<IServiceProvider, TService> implementationFactory,
@@ -62,6 +64,7 @@ namespace DotNetCore.DI.Interception
             return Add<TService, TService>(services, implementationFactory, serviceLifetime, interceptors);
         }
 
+        // BUG : Specified type is not an interface Parameter name: interfaceToProxy
         public static IServiceCollection Add<TService>(
             this IServiceCollection services,
             Func<IServiceProvider, TService> implementationFactory,
