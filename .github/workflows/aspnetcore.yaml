@@ -17,7 +17,7 @@ jobs:
         dotnet-version: 2.2.402
 
     - name: Build with dotnet
-      run: dotnet build --configuration Release
+      run: dotnet build "DotNetCore.DI.Interception\DotNetCore.DI.Interception.sln" --configuration Release
 
     - name: Test with dotnet
-      run: dotnet test --configuration Release
+      run: dotnet test "DotNetCore.DI.Interception\DotNetCore.DI.Interception.sln" --configuration Release
