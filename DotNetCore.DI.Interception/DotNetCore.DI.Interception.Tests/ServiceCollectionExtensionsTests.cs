@@ -255,5 +255,98 @@ namespace DotNetCore.DI.Interception.Tests
         }
 
         #endregion
+
+        [Test]
+        public void x()
+        {
+            var services = new ServiceCollection();
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            ServiceCollectionExtensions.Add<TestService>(
+                services,
+                ImplementationFactory,
+                ServiceLifetime.Transient,
+                proxyGenerationOptions,
+                interceptors);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var service = serviceProvider.GetService<TestService>();
+
+            Assert.IsNotNull(service);
+            Assert.IsInstanceOf<TestService>(service);
+
+            var proxyTargetAccessor = service as IProxyTargetAccessor;
+            Assert.IsNotNull(proxyTargetAccessor);
+
+            var actualInterceptors = proxyTargetAccessor.GetInterceptors();
+            Assert.AreEqual(actualInterceptors.Length, interceptors.Length);
+            Assert.AreEqual(actualInterceptors[0], interceptors[0]);
+
+            var proxyTarget = proxyTargetAccessor.DynProxyGetTarget();
+            Assert.IsInstanceOf<TestService>(proxyTarget);
+        }
+
+        [Test]
+        public void x1()
+        {
+            var services = new ServiceCollection();
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            ServiceCollectionExtensions.Add<TestService>(
+                 services,
+                ImplementationFactory,
+            ServiceLifetime.Transient,
+                interceptors);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var service = serviceProvider.GetService<TestService>();
+
+            Assert.IsNotNull(service);
+            Assert.IsInstanceOf<TestService>(service);
+
+            var proxyTargetAccessor = service as IProxyTargetAccessor;
+            Assert.IsNotNull(proxyTargetAccessor);
+
+            var actualInterceptors = proxyTargetAccessor.GetInterceptors();
+            Assert.AreEqual(actualInterceptors.Length, interceptors.Length);
+            Assert.AreEqual(actualInterceptors[0], interceptors[0]);
+
+            var proxyTarget = proxyTargetAccessor.DynProxyGetTarget();
+            Assert.IsInstanceOf<TestService>(proxyTarget);
+        }
+
+        [Test]
+        public void x2()
+        {
+            var services = new ServiceCollection();
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            ServiceCollectionExtensions.Add<TestService>(
+                services,
+                ServiceLifetime.Transient,
+            proxyGenerationOptions,
+               interceptors);
+
+            var serviceProvider = services.BuildServiceProvider();
+            var service = serviceProvider.GetService<TestService>();
+
+            Assert.IsNotNull(service);
+            Assert.IsInstanceOf<TestService>(service);
+
+            var proxyTargetAccessor = service as IProxyTargetAccessor;
+            Assert.IsNotNull(proxyTargetAccessor);
+
+            var actualInterceptors = proxyTargetAccessor.GetInterceptors();
+            Assert.AreEqual(actualInterceptors.Length, interceptors.Length);
+            Assert.AreEqual(actualInterceptors[0], interceptors[0]);
+
+            var proxyTarget = proxyTargetAccessor.DynProxyGetTarget();
+            Assert.IsInstanceOf<TestService>(proxyTarget);
+        }
     }
 }

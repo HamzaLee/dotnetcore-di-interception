@@ -29,7 +29,9 @@ namespace DotNetCore.DI.Interception
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService, TService>(services, serviceLifetime, proxyGenerationOptions, interceptors);
+            //return Add<TService, TService>(services, serviceLifetime, proxyGenerationOptions, interceptors);
+
+            return Add<TService>(services, ActivatorUtilities.GetServiceOrCreateInstance<TService>, serviceLifetime, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection Add<TService, TImplementation>(
@@ -61,7 +63,11 @@ namespace DotNetCore.DI.Interception
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService, TService>(services, implementationFactory, serviceLifetime, interceptors);
+            //return Add<TService, TService>(services, implementationFactory, serviceLifetime, interceptors);
+            TService ProxyFactory(TService implementationInstance) =>
+                Generator.CreateClassProxyWithTarget<TService>(implementationInstance, interceptors);
+
+            return Add(services, implementationFactory, serviceLifetime, ProxyFactory);
         }
 
         // BUG : Specified type is not an interface Parameter name: interfaceToProxy
@@ -73,7 +79,10 @@ namespace DotNetCore.DI.Interception
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService, TService>(services, implementationFactory, serviceLifetime, proxyGenerationOptions, interceptors);
+            TService ProxyFactory(TService implementationInstance) =>
+                Generator.CreateClassProxyWithTarget<TService>(implementationInstance, proxyGenerationOptions, interceptors);
+
+            return Add(services, implementationFactory, serviceLifetime, ProxyFactory);
         }
 
         public static IServiceCollection Add<TService, TImplementation>(
