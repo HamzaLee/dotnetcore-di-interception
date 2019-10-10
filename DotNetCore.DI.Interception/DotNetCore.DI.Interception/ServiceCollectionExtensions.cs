@@ -1,8 +1,6 @@
-﻿using Castle.DynamicProxy;
+﻿using System;
+using Castle.DynamicProxy;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Diagnostics;
-using System.Linq;
 
 namespace DotNetCore.DI.Interception
 {
@@ -18,7 +16,21 @@ namespace DotNetCore.DI.Interception
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService, TService>(services, serviceLifetime, interceptors);
+            TService ImplementationFactory(IServiceProvider serviceProvider) => ActivatorUtilities.CreateInstance<TService>(serviceProvider);
+
+            return Add(services, ImplementationFactory, serviceLifetime, interceptors);
+        }
+
+        public static IServiceCollection Add<TService>(
+            this IServiceCollection services,
+            ServiceLifetime serviceLifetime,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+        {
+            TService ImplementationFactory(IServiceProvider serviceProvider) => ActivatorUtilities.CreateInstance<TService>(serviceProvider);
+
+            return Add(services, ImplementationFactory, serviceLifetime, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection Add<TService, TImplementation>(
@@ -28,7 +40,24 @@ namespace DotNetCore.DI.Interception
            where TService : class
            where TImplementation : class, TService
         {
-            return Add<TService, TImplementation>(services, ActivatorUtilities.GetServiceOrCreateInstance<TImplementation>, serviceLifetime, interceptors);
+            TImplementation ImplementationFactory(IServiceProvider serviceProvider) =>
+                ActivatorUtilities.GetServiceOrCreateInstance<TImplementation>(serviceProvider);
+
+            return Add<TService, TImplementation>(services, ImplementationFactory, serviceLifetime, interceptors);
+        }
+
+        public static IServiceCollection Add<TService, TImplementation>(
+            this IServiceCollection services,
+            ServiceLifetime serviceLifetime,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            TImplementation ImplementationFactory(IServiceProvider serviceProvider) =>
+                ActivatorUtilities.GetServiceOrCreateInstance<TImplementation>(serviceProvider);
+
+            return Add<TService, TImplementation>(services, ImplementationFactory, serviceLifetime, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection Add<TService>(
@@ -38,7 +67,39 @@ namespace DotNetCore.DI.Interception
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService, TService>(services, implementationFactory, serviceLifetime, interceptors);
+            if (interceptors == null)
+            {
+                throw new ArgumentNullException(nameof(interceptors));
+            }
+
+            TService ProxyFactory(TService implementationInstance) =>
+                Generator.CreateClassProxyWithTarget(implementationInstance, interceptors);
+
+            return Add(services, implementationFactory, serviceLifetime, ProxyFactory);
+        }
+
+        public static IServiceCollection Add<TService>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TService> implementationFactory,
+            ServiceLifetime serviceLifetime,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+        {
+            if (proxyGenerationOptions == null)
+            {
+                throw new ArgumentNullException(nameof(proxyGenerationOptions));
+            }
+
+            if (interceptors == null)
+            {
+                throw new ArgumentNullException(nameof(interceptors));
+            }
+
+            TService ProxyFactory(TService implementationInstance) =>
+                Generator.CreateClassProxyWithTarget(implementationInstance, proxyGenerationOptions, interceptors);
+
+            return Add(services, implementationFactory, serviceLifetime, ProxyFactory);
         }
 
         public static IServiceCollection Add<TService, TImplementation>(
@@ -49,11 +110,73 @@ namespace DotNetCore.DI.Interception
             where TService : class
             where TImplementation : class, TService
         {
-            var serviceDescriptor = new ServiceDescriptor(typeof(TService), provider =>
+            if (interceptors == null)
             {
-                var implementationInstance = implementationFactory(provider);
-                return Generator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, interceptors);
-            }, serviceLifetime);
+                throw new ArgumentNullException(nameof(interceptors));
+            }
+
+            TService ProxyFactory(TImplementation implementationInstance) =>
+                Generator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, interceptors);
+
+            return Add(services, implementationFactory, serviceLifetime, ProxyFactory);
+        }
+
+        public static IServiceCollection Add<TService, TImplementation>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory,
+            ServiceLifetime serviceLifetime,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            if (proxyGenerationOptions == null)
+            {
+                throw new ArgumentNullException(nameof(proxyGenerationOptions));
+            }
+
+            if (interceptors == null)
+            {
+                throw new ArgumentNullException(nameof(interceptors));
+            }
+
+            TService ProxyFactory(TImplementation implementationInstance) =>
+                Generator.CreateInterfaceProxyWithTarget<TService>(implementationInstance, proxyGenerationOptions, interceptors);
+
+            return Add(services, implementationFactory, serviceLifetime, ProxyFactory);
+        }
+
+        public static IServiceCollection Add<TService, TImplementation>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory,
+            ServiceLifetime serviceLifetime,
+            Func<TImplementation, TService> proxyFactory)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (implementationFactory == null)
+            {
+                throw new ArgumentNullException(nameof(implementationFactory));
+            }
+
+            if (proxyFactory == null)
+            {
+                throw new ArgumentNullException(nameof(proxyFactory));
+            }
+
+            var serviceDescriptor = new ServiceDescriptor(
+                typeof(TService),
+                provider =>
+                {
+                    var implementationInstance = implementationFactory(provider);
+                    return proxyFactory(implementationInstance);
+                },
+                serviceLifetime);
 
             services.Add(serviceDescriptor);
             return services;
@@ -64,9 +187,15 @@ namespace DotNetCore.DI.Interception
         #region AddTransient
 
         public static IServiceCollection AddTransient<TService>(this IServiceCollection services, IInterceptor[] interceptors)
-            where TService : class
+         where TService : class
         {
             return Add<TService>(services, ServiceLifetime.Transient, interceptors);
+        }
+
+        public static IServiceCollection AddTransient<TService>(this IServiceCollection services, ProxyGenerationOptions proxyGenerationOptions, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return Add<TService>(services, ServiceLifetime.Transient, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection AddTransient<TService, TImplementation>(this IServiceCollection services, IInterceptor[] interceptors)
@@ -76,23 +205,54 @@ namespace DotNetCore.DI.Interception
             return Add<TService, TImplementation>(services, ServiceLifetime.Transient, interceptors);
         }
 
+        public static IServiceCollection AddTransient<TService, TImplementation>(
+            this IServiceCollection services,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return Add<TService, TImplementation>(services, ServiceLifetime.Transient, proxyGenerationOptions, interceptors);
+        }
+
         public static IServiceCollection AddTransient<TService>(
             this IServiceCollection services,
             Func<IServiceProvider, TService> implementationFactory,
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService>(services, implementationFactory, ServiceLifetime.Transient, interceptors);
+            return Add(services, implementationFactory, ServiceLifetime.Transient, interceptors);
+        }
+
+        public static IServiceCollection AddTransient<TService>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TService> implementationFactory,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+        {
+            return Add(services, implementationFactory, ServiceLifetime.Transient, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection AddTransient<TService, TImplementation>(
             this IServiceCollection services,
-            Func<IServiceProvider, TImplementation> implementationFactory, 
+            Func<IServiceProvider, TImplementation> implementationFactory,
             IInterceptor[] interceptors)
             where TService : class
             where TImplementation : class, TService
         {
             return Add<TService, TImplementation>(services, implementationFactory, ServiceLifetime.Transient, interceptors);
+        }
+
+        public static IServiceCollection AddTransient<TService, TImplementation>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return Add<TService, TImplementation>(services, implementationFactory, ServiceLifetime.Transient, proxyGenerationOptions, interceptors);
         }
 
         #endregion
@@ -105,6 +265,12 @@ namespace DotNetCore.DI.Interception
             return Add<TService>(services, ServiceLifetime.Scoped, interceptors);
         }
 
+        public static IServiceCollection AddScoped<TService>(this IServiceCollection services, ProxyGenerationOptions proxyGenerationOptions, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return Add<TService>(services, ServiceLifetime.Scoped, proxyGenerationOptions, interceptors);
+        }
+
         public static IServiceCollection AddScoped<TService, TImplementation>(this IServiceCollection services, IInterceptor[] interceptors)
             where TService : class
             where TImplementation : class, TService
@@ -112,23 +278,51 @@ namespace DotNetCore.DI.Interception
             return Add<TService, TImplementation>(services, ServiceLifetime.Scoped, interceptors);
         }
 
+        public static IServiceCollection AddScoped<TService, TImplementation>(this IServiceCollection services, ProxyGenerationOptions proxyGenerationOptions, IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return Add<TService, TImplementation>(services, ServiceLifetime.Scoped, proxyGenerationOptions, interceptors);
+        }
+
         public static IServiceCollection AddScoped<TService>(
             this IServiceCollection services,
-            Func<IServiceProvider, TService> implementationFactory, 
+            Func<IServiceProvider, TService> implementationFactory,
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService>(services, implementationFactory, ServiceLifetime.Scoped, interceptors);
+            return Add(services, implementationFactory, ServiceLifetime.Scoped, interceptors);
+        }
+
+        public static IServiceCollection AddScoped<TService>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TService> implementationFactory,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+        {
+            return Add(services, implementationFactory, ServiceLifetime.Scoped, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection AddScoped<TService, TImplementation>(
             this IServiceCollection services,
-            Func<IServiceProvider, TImplementation> implementationFactory, 
+            Func<IServiceProvider, TImplementation> implementationFactory,
             IInterceptor[] interceptors)
             where TService : class
             where TImplementation : class, TService
         {
             return Add<TService, TImplementation>(services, implementationFactory, ServiceLifetime.Scoped, interceptors);
+        }
+
+        public static IServiceCollection AddScoped<TService, TImplementation>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return Add<TService, TImplementation>(services, implementationFactory, ServiceLifetime.Scoped, proxyGenerationOptions, interceptors);
         }
 
         #endregion
@@ -141,11 +335,24 @@ namespace DotNetCore.DI.Interception
             return Add<TService>(services, ServiceLifetime.Singleton, interceptors);
         }
 
+        public static IServiceCollection AddSingleton<TService>(this IServiceCollection services, ProxyGenerationOptions proxyGenerationOptions, IInterceptor[] interceptors)
+            where TService : class
+        {
+            return Add<TService>(services, ServiceLifetime.Singleton, proxyGenerationOptions, interceptors);
+        }
+
         public static IServiceCollection AddSingleton<TService, TImplementation>(this IServiceCollection services, IInterceptor[] interceptors)
             where TService : class
             where TImplementation : class, TService
         {
             return Add<TService, TImplementation>(services, ServiceLifetime.Singleton, interceptors);
+        }
+
+        public static IServiceCollection AddSingleton<TService, TImplementation>(this IServiceCollection services, ProxyGenerationOptions proxyGenerationOptions, IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return Add<TService, TImplementation>(services, ServiceLifetime.Singleton, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection AddSingleton<TService>(
@@ -154,17 +361,38 @@ namespace DotNetCore.DI.Interception
             IInterceptor[] interceptors)
             where TService : class
         {
-            return Add<TService>(services, implementationFactory, ServiceLifetime.Singleton, interceptors);
+            return Add(services, implementationFactory, ServiceLifetime.Singleton, interceptors);
+        }
+
+        public static IServiceCollection AddSingleton<TService>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TService> implementationFactory,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+        {
+            return Add(services, implementationFactory, ServiceLifetime.Singleton, proxyGenerationOptions, interceptors);
         }
 
         public static IServiceCollection AddSingleton<TService, TImplementation>(
             this IServiceCollection services,
-            Func<IServiceProvider, TImplementation> implementationFactory, 
+            Func<IServiceProvider, TImplementation> implementationFactory,
             IInterceptor[] interceptors)
             where TService : class
             where TImplementation : class, TService
         {
             return Add<TService, TImplementation>(services, implementationFactory, ServiceLifetime.Singleton, interceptors);
+        }
+
+        public static IServiceCollection AddSingleton<TService, TImplementation>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TImplementation> implementationFactory,
+            ProxyGenerationOptions proxyGenerationOptions,
+            IInterceptor[] interceptors)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            return Add<TService, TImplementation>(services, implementationFactory, ServiceLifetime.Singleton, proxyGenerationOptions, interceptors);
         }
 
         #endregion
