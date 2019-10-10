@@ -419,5 +419,329 @@ namespace DotNetCore.DI.Interception.Tests
         #endregion
 
         #endregion
+
+        #region AddTransient
+
+        [Test]
+        public void AddTransientWithoutImplementationFactoryAndOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            services.AddTransient<TestService>(interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddTransientWithoutImplementationFactoryAndWithOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddTransient<TestService>(proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddTransientWithoutImplementationFactoryAndOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            services.AddTransient<ITestService, TestService>(interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddTransientWithoutImplementationFactoryAndWithOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddTransient<ITestService, TestService>(proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddTransientWithImplementationFactoryAndWithoutOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+
+            services.AddTransient(ImplementationFactory, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddTransientWithImplementationFactoryAndOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddTransient(ImplementationFactory, proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddTransientWithImplementationFactoryAndWithoutOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+
+            services.AddTransient<ITestService, TestService>(ImplementationFactory, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddTransientWithImplementationFactoryAndOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddTransient<ITestService, TestService>(ImplementationFactory, proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Transient, services[0].Lifetime);
+        }
+
+        #endregion
+
+        #region AddScoped
+
+        [Test]
+        public void AddScopedWithoutImplementationFactoryAndOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            services.AddScoped<TestService>(interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddScopedWithoutImplementationFactoryAndWithOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddScoped<TestService>(proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddScopedWithoutImplementationFactoryAndOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            services.AddScoped<ITestService, TestService>(interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddScopedWithoutImplementationFactoryAndWithOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddScoped<ITestService, TestService>(proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddScopedWithImplementationFactoryAndWithoutOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+
+            services.AddScoped(ImplementationFactory, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddScopedWithImplementationFactoryAndOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddScoped(ImplementationFactory, proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddScopedWithImplementationFactoryAndWithoutOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+
+            services.AddScoped<ITestService, TestService>(ImplementationFactory, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddScopedWithImplementationFactoryAndOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddScoped<ITestService, TestService>(ImplementationFactory, proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Scoped, services[0].Lifetime);
+        }
+
+        #endregion
+
+        #region AddSingleton
+
+        [Test]
+        public void AddSingletonWithoutImplementationFactoryAndOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            services.AddSingleton<TestService>(interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddSingletonWithoutImplementationFactoryAndWithOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddSingleton<TestService>(proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddSingletonWithoutImplementationFactoryAndOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+
+            services.AddSingleton<ITestService, TestService>(interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddSingletonWithoutImplementationFactoryAndWithOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddSingleton<ITestService, TestService>(proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddSingletonWithImplementationFactoryAndWithoutOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+
+            services.AddSingleton(ImplementationFactory, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddSingletonWithImplementationFactoryAndOptionsForClass()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddSingleton(ImplementationFactory, proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddSingletonWithImplementationFactoryAndWithoutOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+
+            services.AddSingleton<ITestService, TestService>(ImplementationFactory, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        [Test]
+        public void AddSingletonWithImplementationFactoryAndOptionsForInterface()
+        {
+            var services = new ServiceCollection();
+            IInterceptor[] interceptors = { new StandardInterceptor() };
+            TestService ImplementationFactory(IServiceProvider sp) => new TestService();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+
+            services.AddSingleton<ITestService, TestService>(ImplementationFactory, proxyGenerationOptions, interceptors);
+
+            Assert.AreEqual(1, services.Count);
+            Assert.AreEqual(ServiceLifetime.Singleton, services[0].Lifetime);
+        }
+
+        #endregion
     }
 }
