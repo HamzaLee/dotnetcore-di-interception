@@ -12,5 +12,9 @@ steps:
 - script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 
-- script: dotnet test $(solutionPath) --configuration $(buildConfiguration) --collect "Code coverage"
+- task: DotNetCoreCLI@2
   displayName: 'dotnet test $(buildConfiguration)'
+  inputs:
+    command: 'test'
+    projects: '$(solutionPath)'
+    arguments: '--configuration  $(buildConfiguration) --collect "Code coverage"'
