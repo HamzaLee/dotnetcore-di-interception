@@ -12,3 +12,7 @@
 
 
 ![GitHub Release Date](https://img.shields.io/github/release-date/HamzaLee/dotnetcore-di-interception)
+
+![Nuget](https://img.shields.io/nuget/dt/DotNetCore.DI.Interception)
+
+![Nuget](https://img.shields.io/nuget/v/DotNetCore.DI.Interception)
