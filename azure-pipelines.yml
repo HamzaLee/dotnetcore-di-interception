@@ -1,0 +1,20 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  solutionPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception.sln"
+
+steps:
+- script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test $(buildConfiguration)'
+  inputs:
+    command: 'test'
+    projects: '$(solutionPath)'
+    arguments: '--configuration  $(buildConfiguration) --collect "Code coverage"'
