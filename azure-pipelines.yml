@@ -6,7 +6,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  solutionPath: "GithubActionsTest/GithubActionsTest.sln"
+  solutionPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception.sln"
 
 steps:
 - script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
