@@ -1,0 +1,16 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  solutionPath: "GithubActionsTest/GithubActionsTest.sln"
+
+steps:
+- script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- script: dotnet test $(solutionPath) --configuration $(buildConfiguration) --collect "Code coverage"
+  displayName: 'dotnet test $(buildConfiguration)'
