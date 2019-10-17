@@ -1,5 +1,6 @@
 trigger:
 - master
+- develop
 
 pool:
   vmImage: 'windows-latest'
@@ -7,10 +8,15 @@ pool:
 variables:
   buildConfiguration: 'Release'
   solutionPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception.sln"
-
+  projectToPackPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception/DotNetCore.DI.Interception.csproj"
+  
 steps:
-- script: dotnet build $(solutionPath) --configuration $(buildConfiguration)
+- task: DotNetCoreCLI@2
   displayName: 'dotnet build $(buildConfiguration)'
+  inputs:
+    command: 'build'
+    projects: '$(solutionPath)'
+    arguments: '--configuration  $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test $(buildConfiguration)'
@@ -18,3 +24,23 @@ steps:
     command: 'test'
     projects: '$(solutionPath)'
     arguments: '--configuration  $(buildConfiguration) --collect "Code coverage"'
+
+- task: DotNetCoreCLI@2
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  displayName: "dotnet pack $(buildConfiguration)"
+  inputs:
+    command: 'pack'
+    arguments: '--configuration $(buildConfiguration)'
+    packagesToPack: '$(projectToPackPath)'
+    nobuild: true
+    versioningScheme: 'off'
+
+- task: PublishBuildArtifacts@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  displayName: 'publish artifact: drop'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+
+- script: dotnet nuget push $(build.artifactstagingdirectory)/*.nupkg -k $(NUGET_API_KEY) -s https://api.nuget.org/v3/index.json
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  displayName: push to nuget
