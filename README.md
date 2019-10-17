@@ -1,4 +1,4 @@
-# DotNetCore Dependency Injection Interception
+# DotNet Core Dependency Injection Interception
 
 The package adds interception to the default dependency injection container.
 
