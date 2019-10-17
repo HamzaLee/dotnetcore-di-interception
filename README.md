@@ -6,6 +6,19 @@ The package adds interception to the default dependency injection container.
 
 ![GitHub](https://img.shields.io/github/license/HamzaLee/dotnetcore-di-interception)
 
+## Usage
+
+The package extends the default dependency injection container by adding overloads of the existant methods that accept interceptors as parameters.
+
+The repository contains a solution DotNetCore.DI.Interception.Samples.sln where some examples can be found.
+
+Example:
+```
+services.AddTransient<ICustomService, CustomService>(new IInterceptor[] { new DebuggerInterceptor() });
+```
+
+For more information about interception, please refer to [Castle Core](https://github.com/castleproject/Core)
+
 ## Build
 
 | Platforms       | Master       | Develop    |
