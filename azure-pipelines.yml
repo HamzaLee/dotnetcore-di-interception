@@ -2,45 +2,73 @@ trigger:
 - master
 - develop
 
-pool:
-  vmImage: 'windows-latest'
+stages:
 
-variables:
-  buildConfiguration: 'Release'
-  solutionPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception.sln"
-  projectToPackPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception/DotNetCore.DI.Interception.csproj"
+- stage: 'Build'
+  variables:
+    buildConfiguration: 'Release'
+    solutionPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception.sln"
+    projectToPackPath: "DotNetCore.DI.Interception/DotNetCore.DI.Interception/DotNetCore.DI.Interception.csproj"
+
+  jobs:
+  - job:
+    pool:
+      vmImage: 'windows-latest'
+
+    workspace:
+      clean: all
   
-steps:
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet build $(buildConfiguration)'
-  inputs:
-    command: 'build'
-    projects: '$(solutionPath)'
-    arguments: '--configuration  $(buildConfiguration)'
+    steps:
+    # dotnet build
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build $(buildConfiguration)'
+      inputs:
+        command: 'build'
+        projects: '$(solutionPath)'
+        arguments: '--configuration  $(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet test $(buildConfiguration)'
-  inputs:
-    command: 'test'
-    projects: '$(solutionPath)'
-    arguments: '--configuration  $(buildConfiguration) --collect "Code coverage"'
+    # dotnet test
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test $(buildConfiguration)'
+      inputs:
+        command: 'test'
+        projects: '$(solutionPath)'
+        arguments: '--configuration  $(buildConfiguration) --collect "Code coverage"'
 
-- task: DotNetCoreCLI@2
+    # dotnet pack
+    - task: DotNetCoreCLI@2
+      displayName: 'Create NuGet Package - Release Version'
+      inputs:
+        command: pack
+        packagesToPack: '$(projectToPackPath)'
+        packDirectory: '$(Build.ArtifactStagingDirectory)/packages/releases'
+        arguments: '--configuration $(buildConfiguration)'
+        nobuild: true 
+    
+    # publish the package in artifact directory
+    - publish: '$(Build.ArtifactStagingDirectory)/packages'
+      artifact: 'packages'
+
+# Publish nuget when the branch is master
+- stage: 'PublishReleaseNuGetPackage'
+  displayName: 'Publish Release NuGet Package'
+  dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  displayName: "dotnet pack $(buildConfiguration)"
-  inputs:
-    command: 'pack'
-    arguments: '--configuration $(buildConfiguration)'
-    packagesToPack: '$(projectToPackPath)'
-    nobuild: true
-    versioningScheme: 'off'
+  jobs:
+  - deployment:
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'nuget-org'
+    strategy:
+     runOnce:
+       deploy:
+         steps:
+         - task: NuGetCommand@2
+           displayName: 'Push NuGet Package'
+           inputs:
+             command: 'push'
+             packagesToPush: '$(Pipeline.Workspace)/packages/releases/*.nupkg'
+             nuGetFeedType: 'external'
+             publishFeedCredentials: 'NuGet'
 
-- task: PublishBuildArtifacts@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  displayName: 'publish artifact: drop'
-  inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
 
-- script: dotnet nuget push $(build.artifactstagingdirectory)\*.nupkg -k $(NUGET_API_KEY) -s https://api.nuget.org/v3/index.json
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  displayName: push to nuget
