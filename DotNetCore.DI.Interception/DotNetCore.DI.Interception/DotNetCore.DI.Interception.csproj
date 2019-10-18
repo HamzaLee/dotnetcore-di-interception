@@ -2,19 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Version>1.0.1-alpha1</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1-alpha2</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/HamzaLee/dotnetcore-di-interception</RepositoryUrl>
     <PackageProjectUrl>https://github.com/HamzaLee/dotnetcore-di-interception</PackageProjectUrl>
-    <Copyright>Hamza Lee - 2019</Copyright>
+    <Copyright>Copyright © Hamza Lee 2019</Copyright>
     <RepositoryType>git</RepositoryType>
     <Authors>Hamza Lee</Authors>
     <Description>The package adds interception to the default dependency injection container.</Description>
+    <PackageTags>ioc dependency injection core interception</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Core.AsyncInterceptor" Version="1.7.0" />
+    <PackageReference Include="Castle.Core" Version="4.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
   </ItemGroup>
 

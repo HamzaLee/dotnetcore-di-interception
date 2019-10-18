@@ -3,21 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{8E041F6C-8F2F-4542-858C-F74A6A46E81E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{5C784AEF-240F-4533-85B7-94CF1D2C7177}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCore.DI.Interception", "DotNetCore.DI.Interception\DotNetCore.DI.Interception.csproj", "{00DCF852-C32B-4EF3-9994-434A18F31E48}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCore.DI.Interception.Interceptors", "DotNetCore.DI.Interception.Interceptors\DotNetCore.DI.Interception.Interceptors.csproj", "{48047EF3-8563-45F8-A723-5FAF2A719AB9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCore.DI.Interception.Sample.Services", "DotNetCore.DI.Interception.Sample.Services\DotNetCore.DI.Interception.Sample.Services.csproj", "{7807D454-997E-4515-B260-E831978D8192}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCore.DI.Interception.Sample.WebApp", "DotNetCore.DI.Interception.Sample.WebApp\DotNetCore.DI.Interception.Sample.WebApp.csproj", "{5DAAF727-45B8-4CC3-8BB8-99876A7A542D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A7475807-1353-4559-96B4-7569A555E97D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetCore.DI.Interception.Tests", "DotNetCore.DI.Interception.Tests\DotNetCore.DI.Interception.Tests.csproj", "{170B0516-963C-48F3-8229-E1B31EC4AEE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCore.DI.Interception.Tests", "DotNetCore.DI.Interception.Tests\DotNetCore.DI.Interception.Tests.csproj", "{170B0516-963C-48F3-8229-E1B31EC4AEE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,18 +21,6 @@ Global
 		{00DCF852-C32B-4EF3-9994-434A18F31E48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00DCF852-C32B-4EF3-9994-434A18F31E48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00DCF852-C32B-4EF3-9994-434A18F31E48}.Release|Any CPU.Build.0 = Release|Any CPU
-		{48047EF3-8563-45F8-A723-5FAF2A719AB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48047EF3-8563-45F8-A723-5FAF2A719AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48047EF3-8563-45F8-A723-5FAF2A719AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48047EF3-8563-45F8-A723-5FAF2A719AB9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7807D454-997E-4515-B260-E831978D8192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7807D454-997E-4515-B260-E831978D8192}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7807D454-997E-4515-B260-E831978D8192}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7807D454-997E-4515-B260-E831978D8192}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5DAAF727-45B8-4CC3-8BB8-99876A7A542D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DAAF727-45B8-4CC3-8BB8-99876A7A542D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DAAF727-45B8-4CC3-8BB8-99876A7A542D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DAAF727-45B8-4CC3-8BB8-99876A7A542D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{170B0516-963C-48F3-8229-E1B31EC4AEE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{170B0516-963C-48F3-8229-E1B31EC4AEE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{170B0516-963C-48F3-8229-E1B31EC4AEE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,9 +31,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{00DCF852-C32B-4EF3-9994-434A18F31E48} = {5C784AEF-240F-4533-85B7-94CF1D2C7177}
-		{48047EF3-8563-45F8-A723-5FAF2A719AB9} = {8E041F6C-8F2F-4542-858C-F74A6A46E81E}
-		{7807D454-997E-4515-B260-E831978D8192} = {8E041F6C-8F2F-4542-858C-F74A6A46E81E}
-		{5DAAF727-45B8-4CC3-8BB8-99876A7A542D} = {8E041F6C-8F2F-4542-858C-F74A6A46E81E}
 		{170B0516-963C-48F3-8229-E1B31EC4AEE3} = {A7475807-1353-4559-96B4-7569A555E97D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
