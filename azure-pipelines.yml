@@ -41,6 +41,6 @@ steps:
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
 
-- script: dotnet nuget push $(build.artifactstagingdirectory)/*.nupkg -k $(NUGET_API_KEY) -s https://api.nuget.org/v3/index.json
+- script: dotnet nuget push $(build.artifactstagingdirectory)\*.nupkg -k $(NUGET_API_KEY) -s https://api.nuget.org/v3/index.json
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   displayName: push to nuget
